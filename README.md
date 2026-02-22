@@ -1,48 +1,99 @@
 # Zepto-Sales-and-Delivery-Analysis
 
-<img width="1366" height="782" alt="image" src="https://github.com/user-attachments/assets/84d9b24c-6857-4dfa-814e-30378709ce2e" />
+<img width="1377" height="781" alt="image" src="https://github.com/user-attachments/assets/c3a075ad-cd95-48d8-bd06-e0c103d436d8" />
 
 
-📌 Project Overview  
-The Zepto Sales & Delivery Dashboard is an interactive business intelligence project designed to analyze sales performance, delivery efficiency, and customer behavior. It provides actionable insights through dynamic visualizations and KPI tracking to support data-driven decision-making.
 
-🎯 Key Objectives  
-Monitor overall sales and revenue performance.  
-Analyze the impact of delivery time on revenue and customer ratings.  
-Understand customer demographics and purchasing behavior.  
-Compare revenue across payment methods and product categories.  
-Enable interactive data exploration using filters.
+📊 Zepto Sales & Delivery Performance Analysis
 
-📊 Key Features  
-🔹 KPI Summary  
-Total Revenue: ₹24.36M  
-Total Orders: 41K    
-Average Order Value (AOV): ₹594  
-Average Customer Rating: 3.20  
-🔹 Revenue Decay vs Service Quality  
-Analyzes how delivery time (5–25 mins) impacts revenue.  
-Shows correlation between faster delivery and higher ratings.  
+A Business-Focused Operational Case Study
 
-🔹 Revenue Share by Age Demographic  
-Donut chart visualization of revenue contribution by age group.  
-Helps identify high-value customer segments.  
+🔎 Project Objective
 
-🔹 Revenue by Payment Method    
-Compares Credit Card, UPI, Cash on Delivery, Debit Card, and Wallet transactions.    
-Identifies dominant payment preferences.  
+This project analyzes sales and delivery performance data to evaluate how operational efficiency impacts revenue outcomes.
 
-🔹 Revenue vs Order Volume by Category  
-Combined bar and line chart analysis.  
-Highlights top-performing product categories.  
+The goal is to identify whether delivery time affects business performance and uncover actionable operational insights.
 
-🔹 Interactive Filters  
-City selection  
-Customer segment selection  
-Product category selection  
+📁 Dataset
 
-🛠 Tools & Technologies Used  
-Python/SQL/Power BI  
-Data visualization techniques  
+Source: Kaggle (simulated quick-commerce dataset)
+
+Scope: Sales, delivery time, customer ratings, payment methods, product categories, and customer segments
+
+Total Orders: 41,000
+
+Total Revenue: ₹24.36M
+
+📌 Key KPIs
+
+Total Revenue: ₹24.36M
+
+Total Orders: 41K
+
+Average Order Value (AOV): ₹594
+
+Average Customer Rating: 3.20
+
+Late Delivery %: Defined as delivery time > 15 minutes
+
+📊 Key Insights
+1️⃣ Revenue Declines Sharply with Increased Delivery Time
+
+Revenue contribution drops significantly beyond the 10–15 minute delivery window.
+
+5 min deliveries contribute the highest revenue (₹15.3M)
+
+Revenue drops drastically after 15 minutes
+
+25 min deliveries contribute almost negligible revenue
+
+Insight: Operational efficiency directly impacts revenue performance.
+
+2️⃣ Late Deliveries Generate Significantly Lower Revenue
+
+Late deliveries (defined as >15 minutes) contribute disproportionately lower revenue compared to on-time orders.
+
+On-Time Revenue: ₹22M
+
+Late Delivery Revenue: ₹2M
+
+Insight: Improving delivery speed could directly improve revenue retention.
+
+3️⃣ Revenue Distribution by Category
+
+Core grocery categories drive consistent revenue contribution across segments, indicating stable demand patterns in essential goods.
+
+4️⃣ Minimal Variation Across Demographics & Payment Methods
+
+Customer ratings and revenue distribution show limited variation across age groups and payment methods.
+
+Insight: Operational performance appears to influence revenue more strongly than demographic factors.
+
+🧠 Business Recommendations
+
+Based on the analysis:
+
+Improve operational efficiency to maintain delivery times under 15 minutes.
+
+Optimize staffing during peak demand windows.
+
+Monitor late delivery percentage as a core performance KPI.
+
+Focus strategic improvements on delivery operations rather than demographic segmentation.
+
+🛠 Tools Used
+
+Python (Pandas, Matplotlib) – Data cleaning & preprocessing
+
+Power BI – Dashboard & KPI visualization
+
+SQL – Data aggregation & querying
+
+📌 Conclusion
+
+This analysis demonstrates that delivery time is a key operational driver of revenue performance in quick-commerce models.
+
+The findings highlight the importance of operational speed and efficiency in sustaining revenue growth.
 
 📈 Business Insights  
 Faster delivery significantly improves revenue and customer satisfaction.  
