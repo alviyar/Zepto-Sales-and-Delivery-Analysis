@@ -5,11 +5,11 @@
 📌 Project Overview
 The Zepto Sales & Delivery Dashboard is an interactive business intelligence project designed to analyze sales performance, delivery efficiency, and customer behavior. It provides actionable insights through dynamic visualizations and KPI tracking to support data-driven decision-making.
 
-🎯 Key Objectives
-Monitor overall sales and revenue performance.
-Analyze the impact of delivery time on revenue and customer ratings.
-Understand customer demographics and purchasing behavior.
-Compare revenue across payment methods and product categories.
+🎯 Key Objectives  
+Monitor overall sales and revenue performance.  
+Analyze the impact of delivery time on revenue and customer ratings.  
+Understand customer demographics and purchasing behavior.  
+Compare revenue across payment methods and product categories.  
 Enable interactive data exploration using filters.
 
 📊 Key Features
