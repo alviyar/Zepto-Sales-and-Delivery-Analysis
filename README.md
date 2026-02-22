@@ -1,6 +1,7 @@
 # Zepto-Sales-and-Delivery-Analysis
 
-<img width="1391" height="797" alt="image" src="https://github.com/user-attachments/assets/ab9c89a6-8349-4e07-988d-f268aee4b8ca" />
+<img width="1366" height="782" alt="image" src="https://github.com/user-attachments/assets/84d9b24c-6857-4dfa-814e-30378709ce2e" />
+
 
 📌 Project Overview  
 The Zepto Sales & Delivery Dashboard is an interactive business intelligence project designed to analyze sales performance, delivery efficiency, and customer behavior. It provides actionable insights through dynamic visualizations and KPI tracking to support data-driven decision-making.
