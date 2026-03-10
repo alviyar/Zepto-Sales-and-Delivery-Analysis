@@ -3,718 +3,813 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zepto Sales & Delivery Dashboard</title>
+<title>Zepto Sales & Delivery — Performance Analysis</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root {
-    --p900: #1a0a2e;
-    --p800: #2d1654;
-    --p700: #4a2080;
-    --p600: #6b35b8;
-    --p500: #8b4fd8;
-    --p400: #a96ee8;
-    --p300: #c89cf5;
-    --p200: #e4d0fc;
-    --p100: #f5eeff;
-    --white: #ffffff;
-    --text: #1a0a2e;
-    --muted: #7a6a8e;
-    --border: #e8dff5;
-    --surface: #faf7ff;
-    --card: #ffffff;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--surface);
-    color: var(--text);
-    font-family: 'Outfit', sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  /* ── NAV ── */
-  nav {
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 0 5vw;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .nav-logo {
-    font-weight: 800;
-    font-size: 1rem;
-    letter-spacing: -0.02em;
-    color: var(--p600);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .nav-logo span {
-    background: var(--p600);
-    color: white;
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    display: grid;
-    place-items: center;
-    font-size: 0.75rem;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-  }
-
-  .nav-links a {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--muted);
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--p600); }
-
-  /* ── HERO ── */
-  .hero {
-    background: var(--p900);
-    padding: 5rem 5vw 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(107,53,184,0.4) 0%, transparent 70%);
-    top: -200px; right: -100px;
-    pointer-events: none;
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(169,110,232,0.2) 0%, transparent 70%);
-    bottom: -150px; left: 10%;
-    pointer-events: none;
-  }
-
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Fira Code', monospace;
-    font-size: 11px;
-    color: var(--p300);
-    letter-spacing: 0.1em;
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeUp 0.7s 0.1s ease forwards;
-  }
-
-  .hero-eyebrow::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: var(--p400);
-  }
-
-  .hero h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
-    color: var(--white);
-    opacity: 0;
-    animation: fadeUp 0.7s 0.2s ease forwards;
-  }
-
-  .hero h1 em {
-    font-style: normal;
-    color: var(--p300);
-  }
-
-  .hero-sub {
-    color: var(--p300);
-    font-size: 1rem;
-    font-weight: 300;
-    margin-top: 1rem;
-    opacity: 0;
-    animation: fadeUp 0.7s 0.3s ease forwards;
-  }
-
-  /* ── KPI CARDS ── */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border-top: 1px solid var(--border);
-    opacity: 0;
-    animation: fadeUp 0.7s 0.4s ease forwards;
-    margin-top: 3rem;
-  }
-
-  .kpi {
-    background: var(--white);
-    padding: 2rem 1.8rem;
-    position: relative;
-    overflow: hidden;
-    transition: background 0.2s;
-  }
-
-  .kpi:hover { background: var(--p100); }
-
-  .kpi::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--p500);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-  .kpi:hover::before { transform: scaleX(1); }
-
-  .kpi-val {
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--p700);
-    line-height: 1;
-  }
-
-  .kpi-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-  }
-
-  /* ── SECTIONS ── */
-  .section { padding: 4rem 5vw; }
-  .section + .section { border-top: 1px solid var(--border); }
-
-  .section-label {
-    font-family: 'Fira Code', monospace;
-    font-size: 10px;
-    color: var(--p500);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-
-  .section-title {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--p900);
-    margin-bottom: 0.4rem;
-  }
-
-  .section-desc {
-    color: var(--muted);
-    font-size: 0.9rem;
-    max-width: 560px;
-    margin-bottom: 2.5rem;
-  }
-
-  /* ── DASHBOARD IMAGE ── */
-  .dash-img-wrap {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 40px rgba(107,53,184,0.1);
-  }
-
-  .dash-img-wrap img {
-    width: 100%;
-    display: block;
-  }
-
-  /* ── CHARTS GRID ── */
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-top: 2.5rem;
-  }
-
-  .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.8rem;
-  }
-
-  .chart-card.full { grid-column: 1 / -1; }
-
-  .chart-heading {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--p800);
-    letter-spacing: 0.02em;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .chart-heading::before {
-    content: '';
-    width: 4px; height: 16px;
-    background: var(--p500);
-    border-radius: 2px;
-  }
-
-  /* Bar charts */
-  .bar-h {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .bar-h-label {
-    font-size: 11px;
-    color: var(--muted);
-    width: 110px;
-    flex-shrink: 0;
-    text-align: right;
-    font-family: 'Fira Code', monospace;
-  }
-
-  .bar-h-track {
-    flex: 1;
-    height: 28px;
-    background: var(--p100);
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .bar-h-fill {
-    height: 100%;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 10px;
-    font-family: 'Fira Code', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    color: white;
-    width: 0;
-    transition: width 1.4s cubic-bezier(0.16,1,0.3,1);
-  }
-
-  /* Vertical bars */
-  .vbars {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    height: 180px;
-    padding-bottom: 28px;
-    position: relative;
-  }
-
-  .vbars::before {
-    content: '';
-    position: absolute;
-    bottom: 28px; left: 0; right: 0;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .vbar-wrap {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .vbar-val {
-    font-family: 'Fira Code', monospace;
-    font-size: 9px;
-    color: var(--p600);
-    font-weight: 500;
-  }
-
-  .vbar {
-    width: 100%;
-    border-radius: 4px 4px 0 0;
-    background: var(--p500);
-    transition: height 1.4s cubic-bezier(0.16,1,0.3,1);
-    height: 0;
-  }
-
-  .vbar-label {
-    position: absolute;
-    bottom: 4px;
-    font-size: 9px;
-    color: var(--muted);
-    text-align: center;
-    width: 100%;
-    font-family: 'Fira Code', monospace;
-  }
-
-  /* Line on top of vbars */
-  .line-overlay {
-    position: absolute;
-    bottom: 28px; left: 0; right: 0;
-    height: calc(100% - 28px);
-    pointer-events: none;
-  }
-
-  /* ── INSIGHTS SECTION ── */
-  .insights-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-
-  .insight-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.8rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-
-  .insight-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(107,53,184,0.12);
-  }
-
-  .insight-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--p500), var(--p300));
-  }
-
-  .insight-num {
-    font-family: 'Fira Code', monospace;
-    font-size: 2.5rem;
-    font-weight: 500;
-    color: var(--p200);
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-
-  .insight-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--p800);
-    margin-bottom: 0.5rem;
-  }
-
-  .insight-body {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .insight-tag {
-    display: inline-block;
-    margin-top: 1rem;
-    font-family: 'Fira Code', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-weight: 500;
-  }
-
-  .tag-critical { background: #fde8e8; color: #c0392b; }
-  .tag-high     { background: #fff3e0; color: #d68910; }
-  .tag-medium   { background: var(--p200); color: var(--p700); }
-
-  /* ── PRIORITY TABLE ── */
-  .priority-table {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .pt-head {
-    display: grid;
-    grid-template-columns: 48px 1fr 180px 110px;
-    padding: 12px 20px;
-    background: var(--p900);
-    font-family: 'Fira Code', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--p300);
-    gap: 1rem;
-  }
-
-  .pt-row {
-    display: grid;
-    grid-template-columns: 48px 1fr 180px 110px;
-    padding: 1.2rem 20px;
-    border-bottom: 1px solid var(--border);
-    gap: 1rem;
-    align-items: start;
-    transition: background 0.2s;
-  }
-
-  .pt-row:last-child { border-bottom: none; }
-  .pt-row:hover { background: var(--p100); }
-
-  .pt-num {
-    font-family: 'Fira Code', monospace;
-    font-size: 1.2rem;
-    color: var(--p300);
-    font-weight: 500;
-  }
-
-  .pt-finding {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--p800);
-    margin-bottom: 0.25rem;
-  }
-
-  .pt-action { font-size: 0.8rem; color: var(--muted); }
-
-  .pt-impact {
-    font-family: 'Fira Code', monospace;
-    font-size: 0.75rem;
-    color: var(--p600);
-    line-height: 1.6;
-  }
-
-  .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-size: 10px;
-    font-weight: 600;
-    font-family: 'Fira Code', monospace;
-    letter-spacing: 0.05em;
-  }
-
-  .badge-critical { background: #fde8e8; color: #c0392b; }
-  .badge-high     { background: #fff3e0; color: #d68910; }
-  .badge-medium   { background: var(--p200); color: var(--p700); }
-
-  /* ── FRAMEWORK ── */
-  .fw-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 2rem;
-  }
-
-  .fw-item {
-    background: var(--card);
-    padding: 2rem 1.8rem;
-    transition: background 0.2s;
-  }
-
-  .fw-item:hover { background: var(--p100); }
-
-  .fw-tier {
-    font-family: 'Fira Code', monospace;
-    font-size: 9px;
-    color: var(--p400);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.8rem;
-  }
-
-  .fw-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--p800);
-    margin-bottom: 0.6rem;
-  }
-
-  .fw-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
-
-  .fw-metric {
-    margin-top: 1rem;
-    font-family: 'Fira Code', monospace;
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--p600);
-  }
-
-  /* ── CONCLUSION ── */
-  .conclusion {
-    background: var(--p900);
-    color: white;
-    padding: 4rem 5vw;
-  }
-
-  .conclusion .section-title { color: white; }
-  .conclusion .section-label { color: var(--p300); }
-  .conclusion .section-desc { color: var(--p300); max-width: 700px; margin-bottom: 0; }
-
-  .conc-stat {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin-top: 2rem;
-  }
-
-  .conc-stat-val {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--p300);
-    letter-spacing: -0.02em;
-  }
-
-  .conc-stat-desc {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.5);
-    margin-top: 0.3rem;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    background: var(--white);
-    border-top: 1px solid var(--border);
-    padding: 1.5rem 5vw;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .footer-brand {
-    font-weight: 800;
-    font-size: 0.85rem;
-    color: var(--p600);
-    letter-spacing: -0.01em;
-  }
-
-  .footer-note {
-    font-family: 'Fira Code', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  /* ── REVEAL ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .reveal.visible { opacity: 1; transform: none; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .kpi-row { grid-template-columns: repeat(2, 1fr); }
-    .charts-grid { grid-template-columns: 1fr; }
-    .chart-card.full { grid-column: 1; }
-    .insights-grid { grid-template-columns: 1fr 1fr; }
-    .fw-grid { grid-template-columns: 1fr; }
-    .pt-head, .pt-row { grid-template-columns: 40px 1fr; }
-    .pt-impact, .pt-row > :last-child { display: none; }
-    .nav-links { display: none; }
-  }
-
-  @media (max-width: 600px) {
-    .kpi-row { grid-template-columns: 1fr; }
-    .insights-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── DUAL METRIC ── */
-  .dual-metric {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 1rem;
-  }
-
-  .dm-item {
-    background: var(--card);
-    padding: 1.5rem;
-    text-align: center;
-  }
-
-  .dm-val {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-
-  .dm-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
-
-  /* Donut / Ring chart */
-  .ring-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 0.5rem;
-  }
-
-  .ring-legend { display: flex; flex-direction: column; gap: 0.6rem; }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+/* ════════════════════════════════════
+   PALETTE  —  #6b007b shades
+   ════════════════════════════════════ */
+:root {
+  --p950: #1a001f;
+  --p900: #2d0036;
+  --p800: #4a0060;
+  --p700: #6b007b;   /* brand anchor */
+  --p600: #8a00a0;
+  --p500: #a800c8;
+  --p400: #c44de0;
+  --p300: #da85ee;
+  --p200: #edc3f7;
+  --p100: #f8eeff;
+  --p50:  #fdf6ff;
+
+  --white:   #ffffff;
+  --text:    #1a001f;
+  --muted:   #7a5a85;
+  --border:  #e5cdf0;
+  --surface: #faf4ff;
+  --card:    #ffffff;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--p300); border-radius:99px; }
+::-webkit-scrollbar-thumb:hover { background:var(--p500); }
+
+/* ════════════════════════════════════
+   GITHUB BANNER
+   ════════════════════════════════════ */
+.gh-banner {
+  background: var(--p950);
+  padding: 9px 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.gh-banner a {
+  color: var(--p300);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 0.2s;
+}
+.gh-banner a:hover { color: var(--white); }
+.gh-banner .gh-label { color: var(--p400); font-size: 11px; }
+.gh-icon {
+  width: 16px; height: 16px; fill: var(--p300);
+  flex-shrink: 0; transition: fill 0.2s;
+}
+.gh-banner a:hover .gh-icon { fill: var(--white); }
+.gh-divider { color: var(--p700); margin: 0 4px; }
+
+/* ════════════════════════════════════
+   NAV
+   ════════════════════════════════════ */
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 5vw;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 12px rgba(107,0,123,0.06);
+}
+.nav-logo {
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+  color: var(--p700);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.nav-logo-badge {
+  background: var(--p700);
+  color: white;
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.nav-links { display:flex; gap:2rem; list-style:none; }
+.nav-links a {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--p700); }
+
+/* ════════════════════════════════════
+   HERO
+   ════════════════════════════════════ */
+.hero {
+  background: var(--p900);
+  padding: 5rem 5vw 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-glow1 {
+  position:absolute; width:700px; height:700px;
+  background: radial-gradient(circle, rgba(164,0,196,0.35) 0%, transparent 65%);
+  top:-280px; right:-150px; pointer-events:none;
+}
+.hero-glow2 {
+  position:absolute; width:500px; height:500px;
+  background: radial-gradient(circle, rgba(107,0,123,0.25) 0%, transparent 65%);
+  bottom:-200px; left:5%; pointer-events:none;
+}
+.hero-content { position:relative; z-index:1; }
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--p300);
+  letter-spacing: 0.12em;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.1s ease forwards;
+}
+.hero-eyebrow::before { content:''; width:22px; height:1px; background:var(--p400); }
+.hero h1 {
+  font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--white);
+  opacity: 0;
+  animation: fadeUp 0.7s 0.2s ease forwards;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(120deg, var(--p300) 0%, var(--p400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  color: var(--p300);
+  font-size: 1rem;
+  font-weight: 300;
+  margin-top: 1rem;
+  max-width: 520px;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.3s ease forwards;
+}
+/* KPI strip inside hero */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 3.5rem;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.4s ease forwards;
+}
+.kpi-tile {
+  background: rgba(255,255,255,0.04);
+  padding: 1.8rem 1.6rem;
+  cursor: default;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-tile:hover { background: rgba(255,255,255,0.08); }
+.kpi-tile::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--p500), var(--p300));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s;
+}
+.kpi-tile:hover::after { transform: scaleX(1); }
+.kpi-tile-val {
+  font-size: 2.2rem; font-weight: 800;
+  letter-spacing: -0.03em; color: var(--white); line-height:1;
+}
+.kpi-tile-label {
+  font-size: 10px; font-weight: 600;
+  color: var(--p300); letter-spacing: 0.07em;
+  text-transform: uppercase; margin-top: 0.45rem;
+}
+
+/* ── HERO GITHUB BUTTON ── */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.38s ease forwards;
+}
+.btn-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 8px;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(8px);
+  transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-github::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(196,77,224,0.18), rgba(107,0,123,0.1));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.btn-github:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: var(--p300);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(107,0,123,0.35);
+}
+.btn-github:hover::before { opacity: 1; }
+.btn-github:active { transform: translateY(0); }
+.btn-github svg {
+  width: 18px; height: 18px;
+  fill: #fff;
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+}
+.btn-github span { position: relative; z-index: 1; }
+.btn-github-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--p300);
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  letter-spacing: 0.04em;
+}
+
+/* ════════════════════════════════════
+   SECTION SCAFFOLDING
+   ════════════════════════════════════ */
+.section { padding: 4rem 5vw; }
+.section + .section { border-top: 1px solid var(--border); }
+.section-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--p600);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--p900);
+  margin-bottom: 0.35rem;
+}
+.section-desc {
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 560px;
+  margin-bottom: 2.5rem;
+  line-height: 1.75;
+}
+
+/* ════════════════════════════════════
+   INTERACTIVE DASHBOARD WRAPPER
+   ════════════════════════════════════ */
+.db-wrapper {
+  background: var(--p50);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(107,0,123,0.1);
+}
+
+/* Power BI header bar */
+.db-header {
+  background: var(--p700);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.db-header h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.db-dot { width:8px; height:8px; border-radius:50%; background:var(--p300); }
+.db-dot2 { background:var(--p200); opacity:0.6; }
+.db-dot3 { background:var(--p400); opacity:0.4; }
+
+/* Dashboard body */
+.db-body {
+  display: flex;
+  height: 560px;
+}
+
+/* Slicer panel */
+.slicer-panel {
+  width: 185px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px 0;
+}
+.slicer-group { padding: 0 12px 12px; }
+.slicer-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--p700);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 0 5px;
+  border-bottom: 2px solid var(--p200);
+  margin-bottom: 5px;
+}
+.slicer-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+.slicer-item:hover { background: var(--p100); }
+.slicer-item.active { background: var(--p200); }
+.slicer-item input[type=checkbox] {
+  accent-color: var(--p700);
+  width: 12px; height: 12px;
+  cursor: pointer; flex-shrink: 0;
+}
+.slicer-item label {
+  font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.slicer-item.active label { color: var(--p700); font-weight: 600; }
+.clear-btn {
+  display: block; width: 100%;
+  margin-top: 5px; padding: 4px 0;
+  background: var(--p100);
+  border: 1px solid var(--p300);
+  border-radius: 4px;
+  color: var(--p700);
+  font-size: 9px; font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.clear-btn:hover { background: var(--p200); }
+
+/* Main canvas */
+.db-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--p50);
+}
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 5px 10px;
+  background: var(--p100);
+  border: 1px solid var(--p200);
+  border-radius: 5px;
+  font-size: 10px;
+  color: var(--p700);
+}
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--p700);
+  color: #fff;
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.filter-badge:hover { background: var(--p800); }
+
+/* KPI cards inside dashboard */
+.db-kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.db-kpi-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.db-kpi-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--p700), var(--p400));
+}
+.db-kpi-val {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--p700);
+  line-height: 1;
+}
+.db-kpi-label {
+  font-size: 9px; font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* Chart cards inside dashboard */
+.db-chart-row { display:grid; gap:8px; }
+.db-chart-row.two { grid-template-columns: 1fr 1fr; }
+.db-chart-row.three { grid-template-columns: 2fr 1fr; }
+.db-chart-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px;
+}
+.db-chart-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--p800);
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.db-chart-title::before {
+  content:''; width:3px; height:12px;
+  background: var(--p600); border-radius:2px; flex-shrink:0;
+}
+.db-canvas-wrap { position:relative; width:100%; }
+
+@keyframes kpiPop {
+  0%   { transform:scale(1.1); color:var(--p400); }
+  100% { transform:scale(1);   color:var(--p700); }
+}
+.kpi-pop { animation: kpiPop 0.35s ease; }
+
+/* ════════════════════════════════════
+   CHARTS SECTION (static animated)
+   ════════════════════════════════════ */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.6rem;
+}
+.chart-card.full { grid-column: 1 / -1; }
+.chart-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--p800);
+  letter-spacing: 0.03em;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.chart-heading::before {
+  content:''; width:4px; height:14px;
+  background: var(--p600); border-radius:2px; flex-shrink:0;
+}
+
+/* Horizontal bars */
+.bar-h { display:flex; align-items:center; gap:10px; margin-bottom:0.65rem; }
+.bar-h-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px; color:var(--muted);
+  width:115px; flex-shrink:0; text-align:right;
+}
+.bar-h-track {
+  flex:1; height:26px;
+  background:var(--p100); border-radius:4px; overflow:hidden;
+}
+.bar-h-fill {
+  height:100%; border-radius:4px;
+  display:flex; align-items:center; justify-content:flex-end;
+  padding-right:9px;
+  font-family:'Fira Code',monospace; font-size:10px; font-weight:600; color:#fff;
+  width:0;
+  transition: width 1.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* Vertical bars */
+.vbars {
+  display:flex; align-items:flex-end; gap:10px;
+  height:190px; padding-bottom:0; position:relative;
+}
+.vbars::before {
+  content:''; position:absolute;
+  bottom:28px; left:0; right:0; height:1px;
+  background: var(--border);
+}
+.vbar-wrap {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; gap:3px;
+  height:100%; justify-content:flex-end;
+}
+.vbar-val {
+  font-family:'Fira Code',monospace; font-size:9px;
+  color:var(--p600); font-weight:600;
+}
+.vbar {
+  width:100%; border-radius:4px 4px 0 0;
+  background: var(--p600); transition: height 1.5s cubic-bezier(0.16,1,0.3,1);
+  height:0;
+}
+.vbar-label {
+  height:28px; line-height:14px;
+  font-size:9px; color:var(--muted);
+  text-align:center; width:100%;
+  font-family:'Fira Code',monospace;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  padding-top:5px;
+  flex-shrink:0;
+}
+
+/* Dual metric */
+.dual-metric {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:1px; background:var(--border);
+  border-radius:8px; overflow:hidden; margin-top:0.8rem;
+}
+.dm-item { background:var(--card); padding:1.3rem; text-align:center; }
+.dm-val  { font-size:1.8rem; font-weight:800; letter-spacing:-0.02em; }
+.dm-label{ font-size:0.72rem; color:var(--muted); margin-top:0.25rem; }
+
+/* Ring chart */
+.ring-wrap {
+  display:flex; align-items:center; justify-content:center;
+  gap:1.5rem; margin-top:1rem;
+}
+.ring-legend { display:flex; flex-direction:column; gap:0.5rem; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:0.78rem; }
+.legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+/* ════════════════════════════════════
+   INSIGHT CARDS
+   ════════════════════════════════════ */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1.4rem;
+}
+.insight-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.7rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.insight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(107,0,123,0.1);
+}
+.insight-card::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--p700), var(--p300));
+}
+.insight-num {
+  font-family:'Fira Code',monospace;
+  font-size:2.2rem; font-weight:500;
+  color:var(--p200); line-height:1; margin-bottom:0.8rem;
+}
+.insight-title  { font-size:0.92rem; font-weight:700; color:var(--p800); margin-bottom:0.45rem; }
+.insight-body   { font-size:0.83rem; color:var(--muted); line-height:1.7; }
+.insight-tag    {
+  display:inline-block; margin-top:0.9rem;
+  font-family:'Fira Code',monospace; font-size:9px;
+  letter-spacing:0.1em; text-transform:uppercase;
+  padding:3px 10px; border-radius:99px; font-weight:600;
+}
+.tag-critical { background:#fde8e8; color:#c0392b; }
+.tag-high     { background:#fff3e0; color:#c87800; }
+.tag-medium   { background:var(--p200); color:var(--p700); }
+
+/* ════════════════════════════════════
+   PRIORITY TABLE
+   ════════════════════════════════════ */
+.priority-table {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.pt-head {
+  display:grid; grid-template-columns:44px 1fr 185px 110px;
+  padding:11px 18px;
+  background:var(--p900);
+  font-family:'Fira Code',monospace; font-size:9px;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--p300); gap:1rem;
+}
+.pt-row {
+  display:grid; grid-template-columns:44px 1fr 185px 110px;
+  padding:1.1rem 18px;
+  border-bottom:1px solid var(--border);
+  gap:1rem; align-items:start;
+  transition:background 0.2s;
+}
+.pt-row:last-child { border-bottom:none; }
+.pt-row:hover { background:var(--p100); }
+.pt-num { font-family:'Fira Code',monospace; font-size:1.15rem; color:var(--p300); font-weight:500; }
+.pt-finding { font-size:0.88rem; font-weight:700; color:var(--p800); margin-bottom:0.2rem; }
+.pt-action  { font-size:0.79rem; color:var(--muted); line-height:1.6; }
+.pt-impact  { font-family:'Fira Code',monospace; font-size:0.74rem; color:var(--p600); line-height:1.6; }
+
+.badge {
+  display:inline-block; padding:3px 10px;
+  border-radius:99px; font-size:9px; font-weight:700;
+  font-family:'Fira Code',monospace; letter-spacing:0.05em;
+}
+.badge-critical { background:#fde8e8; color:#c0392b; }
+.badge-high     { background:#fff3e0; color:#c87800; }
+.badge-medium   { background:var(--p200); color:var(--p700); }
+
+/* ════════════════════════════════════
+   FRAMEWORK TILES
+   ════════════════════════════════════ */
+.fw-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  margin-top:2rem;
+}
+.fw-item { background:var(--card); padding:1.8rem; transition:background 0.2s; }
+.fw-item:hover { background:var(--p100); }
+.fw-tier  { font-family:'Fira Code',monospace; font-size:9px; color:var(--p500); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.7rem; }
+.fw-title { font-size:1rem; font-weight:700; color:var(--p800); margin-bottom:0.5rem; }
+.fw-desc  { font-size:0.83rem; color:var(--muted); line-height:1.7; }
+.fw-metric{ margin-top:1rem; font-family:'Fira Code',monospace; font-size:1rem; font-weight:600; color:var(--p600); }
+
+/* ════════════════════════════════════
+   CONCLUSION
+   ════════════════════════════════════ */
+.conclusion {
+  background: var(--p900);
+  color: white;
+  padding: 4.5rem 5vw;
+}
+.conclusion .section-title { color: white; }
+.conclusion .section-label { color: var(--p300); }
+.conclusion .section-desc  { color: var(--p300); max-width:660px; margin-bottom:0; }
+.conc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:2rem; }
+.conc-stat {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+}
+.conc-stat-val  { font-size:2rem; font-weight:800; color:var(--p300); letter-spacing:-0.02em; }
+.conc-stat-desc { font-size:0.82rem; color:rgba(255,255,255,0.45); margin-top:0.3rem; line-height:1.6; }
+
+/* ════════════════════════════════════
+   FOOTER
+   ════════════════════════════════════ */
+footer {
+  background:var(--white);
+  border-top:1px solid var(--border);
+  padding:1.4rem 5vw;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer-brand { font-weight:800; font-size:0.85rem; color:var(--p700); }
+.footer-note  { font-family:'Fira Code',monospace; font-size:10px; color:var(--muted); letter-spacing:0.07em; }
+.footer-gh {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'Fira Code',monospace; font-size:10px;
+  color:var(--p600); text-decoration:none;
+  transition:color 0.2s;
+}
+.footer-gh:hover { color:var(--p800); }
+.footer-gh svg { width:14px; height:14px; fill:currentColor; }
+
+/* ════════════════════════════════════
+   SCROLL REVEAL
+   ════════════════════════════════════ */
+.reveal {
+  opacity:0; transform:translateY(22px);
+  transition:opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity:1; transform:none; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(26px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════ */
+@media (max-width:960px) {
+  .kpi-strip          { grid-template-columns:repeat(2,1fr); }
+  .charts-grid        { grid-template-columns:1fr; }
+  .chart-card.full    { grid-column:1; }
+  .insights-grid      { grid-template-columns:1fr 1fr; }
+  .fw-grid            { grid-template-columns:1fr; }
+  .pt-head,.pt-row    { grid-template-columns:36px 1fr; }
+  .pt-impact,.pt-row>:last-child { display:none; }
+  .nav-links          { display:none; }
+  .db-chart-row.three { grid-template-columns:1fr; }
+  .db-chart-row.two   { grid-template-columns:1fr; }
+  .db-kpi-row         { grid-template-columns:repeat(2,1fr); }
+  .conc-grid          { grid-template-columns:1fr; }
+}
+@media (max-width:640px) {
+  .kpi-strip    { grid-template-columns:1fr; }
+  .insights-grid{ grid-template-columns:1fr; }
+  .db-body      { flex-direction:column; height:auto; }
+  .slicer-panel { width:100%; height:auto; border-right:none; border-bottom:1px solid var(--border); }
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ════ GITHUB BANNER ════ -->
+<div class="gh-banner">
+  <span class="gh-label">📂 View Source on</span>
+  <a href="https://github.com/your-username/zepto-sales-delivery-eda" target="_blank" rel="noopener">
+    <svg class="gh-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+    zepto-sales-delivery-eda
+  </a>
+  <span class="gh-divider">·</span>
+  <span class="gh-label">Quick-Commerce EDA · Python · SQL · Power BI</span>
+</div>
+
+<!-- ════ NAV ════ -->
 <nav>
   <div class="nav-logo">
-    <span>Z</span>
+    <div class="nav-logo-badge">Z</div>
     Zepto Analytics
   </div>
   <ul class="nav-links">
@@ -725,124 +820,166 @@
   </ul>
 </nav>
 
-<!-- HERO -->
+<!-- ════ HERO ════ -->
 <header class="hero">
-  <div class="hero-eyebrow">Quick-Commerce · EDA Report · 41K Orders</div>
-  <h1>Zepto Sales &amp;<br><em>Delivery</em> Dashboard</h1>
-  <p class="hero-sub">Sales, Delivery &amp; Revenue Intelligence — Operational performance analysis</p>
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Quick-Commerce · EDA Report · 41K Orders</div>
+    <h1>Zepto Sales &amp;<br><em>Delivery</em> Dashboard</h1>
+    <p class="hero-sub">Sales, Delivery &amp; Revenue Intelligence — Operational performance analysis across 41,000 orders spanning 8 cities.</p>
 
-  <div class="kpi-row">
-    <div class="kpi">
-      <div class="kpi-val">₹24.36M</div>
-      <div class="kpi-label">Total Revenue</div>
+    <div class="hero-actions">
+      <a class="btn-github" href="https://github.com/your-username/zepto-sales-delivery-eda" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <span>View on GitHub</span>
+      </a>
+      <div class="btn-github-star">
+        ⭐ zepto-sales-delivery-eda
+      </div>
     </div>
-    <div class="kpi">
-      <div class="kpi-val">41K</div>
-      <div class="kpi-label">Total Orders</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-val">₹594</div>
-      <div class="kpi-label">Avg Order Value</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-val">3.20</div>
-      <div class="kpi-label">Avg Customer Rating</div>
+
+    <div class="kpi-strip">
+      <div class="kpi-tile">
+        <div class="kpi-tile-val">₹24.36M</div>
+        <div class="kpi-tile-label">Total Revenue</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile-val">41K</div>
+        <div class="kpi-tile-label">Total Orders</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile-val">₹594</div>
+        <div class="kpi-tile-label">Avg Order Value</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile-val">3.20</div>
+        <div class="kpi-tile-label">Avg Customer Rating</div>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- DASHBOARD IMAGE -->
+<!-- ════ INTERACTIVE DASHBOARD ════ -->
 <section class="section" id="dashboard">
-  <div class="section-label reveal">Power BI Dashboard</div>
-  <div class="section-title reveal">Interactive Overview</div>
-  <p class="section-desc reveal">Executive dashboard with dynamic filters for product category, customer segment, payment method, age group, and delivery status.</p>
-  <div class="dash-img-wrap reveal">
-    <img src="zepto.png" alt="Zepto Sales & Delivery Power BI Dashboard">
-  </div>
+  <div class="section-label reveal">Interactive Power BI Clone</div>
+  <div class="section-title reveal">Live Dashboard — Use Slicers to Filter</div>
+  <p class="section-desc reveal">Select any combination of City, Segment, Category, or Delivery Status — all KPIs and charts update instantly.</p>
+
+  <div class="db-wrapper reveal">
+    <!-- PBI-style header -->
+    <div class="db-header">
+      <div class="db-dot"></div>
+      <div class="db-dot db-dot2"></div>
+      <div class="db-dot db-dot3"></div>
+      <h2 style="margin-left:4px;">Zepto Sales &amp; Delivery Dashboard</h2>
+    </div>
+
+    <div class="db-body">
+      <!-- SLICER PANEL -->
+      <aside class="slicer-panel">
+        <div class="slicer-group">
+          <div class="slicer-title">City</div>
+          <div id="citySlicers"></div>
+          <button class="clear-btn" onclick="clearSlicer('city')">✕ Clear</button>
+        </div>
+        <div class="slicer-group">
+          <div class="slicer-title">Customer Segment</div>
+          <div id="segmentSlicers"></div>
+          <button class="clear-btn" onclick="clearSlicer('segment')">✕ Clear</button>
+        </div>
+        <div class="slicer-group">
+          <div class="slicer-title">Product Category</div>
+          <div id="categorySlicers"></div>
+          <button class="clear-btn" onclick="clearSlicer('category')">✕ Clear</button>
+        </div>
+        <div class="slicer-group">
+          <div class="slicer-title">Delivery Status</div>
+          <div id="deliverySlicers"></div>
+          <button class="clear-btn" onclick="clearSlicer('delivery')">✕ Clear</button>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="db-main">
+        <div class="filter-bar" id="filterBar" style="display:none;"></div>
+
+        <!-- KPIs -->
+        <div class="db-kpi-row">
+          <div class="db-kpi-card"><div class="db-kpi-val" id="kpiRevenue">₹24.36M</div><div class="db-kpi-label">Total Revenue</div></div>
+          <div class="db-kpi-card"><div class="db-kpi-val" id="kpiOrders">41K</div><div class="db-kpi-label">Total Orders</div></div>
+          <div class="db-kpi-card"><div class="db-kpi-val" id="kpiAOV">₹594</div><div class="db-kpi-label">Average Order Value</div></div>
+          <div class="db-kpi-card"><div class="db-kpi-val" id="kpiRating">3.20</div><div class="db-kpi-label">Avg Customer Rating</div></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="db-chart-row three">
+          <div class="db-chart-card">
+            <div class="db-chart-title">Revenue &amp; Avg Rating by Delivery Time</div>
+            <div class="db-canvas-wrap" style="height:168px;"><canvas id="chartDelivery"></canvas></div>
+          </div>
+          <div class="db-chart-card">
+            <div class="db-chart-title">Revenue by Late Delivery</div>
+            <div class="db-canvas-wrap" style="height:168px;"><canvas id="chartLate"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="db-chart-row two">
+          <div class="db-chart-card">
+            <div class="db-chart-title">Revenue by Payment Method</div>
+            <div class="db-canvas-wrap" style="height:168px;"><canvas id="chartPayment"></canvas></div>
+          </div>
+          <div class="db-chart-card">
+            <div class="db-chart-title">Revenue vs Orders by Category</div>
+            <div class="db-canvas-wrap" style="height:168px;"><canvas id="chartCategory"></canvas></div>
+          </div>
+        </div>
+      </main>
+    </div><!-- /db-body -->
+  </div><!-- /db-wrapper -->
 </section>
 
-<!-- CHARTS SECTION -->
-<section class="section" id="charts" style="background:var(--surface);">
+<!-- ════ STATIC CHARTS SECTION ════ -->
+<section class="section" id="charts" style="background:var(--p50);">
   <div class="section-label reveal">Exploratory Data Analysis</div>
   <div class="section-title reveal">Key Metrics Breakdown</div>
-  <p class="section-desc reveal">Delivery speed is the single strongest driver of revenue — the relationship is clear and steep.</p>
+  <p class="section-desc reveal">Delivery speed is the single strongest revenue driver — the relationship is steep and non-linear beyond 10 minutes.</p>
 
   <div class="charts-grid">
-
-    <!-- Revenue by Delivery Time -->
+    <!-- Delivery time bars -->
     <div class="chart-card full reveal">
-      <div class="chart-heading">Revenue &amp; Avg Rating by Delivery Time</div>
-      <div style="position:relative;">
-        <div class="vbars" id="deliveryBars">
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹15.3M</div>
-            <div class="vbar" data-pct="100" style="background:var(--p600);"></div>
-            <div class="vbar-label">5 min</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹7.1M</div>
-            <div class="vbar" data-pct="46" style="background:var(--p500);"></div>
-            <div class="vbar-label">10 min</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹1.2M</div>
-            <div class="vbar" data-pct="8" style="background:var(--p400);"></div>
-            <div class="vbar-label">15 min</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹0.8M</div>
-            <div class="vbar" data-pct="5" style="background:var(--p300);"></div>
-            <div class="vbar-label">20 min</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">~₹0</div>
-            <div class="vbar" data-pct="1" style="background:var(--p200);"></div>
-            <div class="vbar-label">25 min</div>
-          </div>
-        </div>
-        <!-- SVG line for avg rating trend -->
-        <svg viewBox="0 0 500 152" style="position:absolute;top:0;left:0;right:0;width:100%;height:152px;pointer-events:none;" preserveAspectRatio="none">
-          <polyline id="ratingLine" points="" fill="none" stroke="var(--p900)" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <circle cx="50" cy="130" r="5" fill="var(--p900)"/>
-          <circle cx="150" cy="100" r="5" fill="var(--p900)"/>
-          <circle cx="250" cy="60" r="5" fill="var(--p900)"/>
-          <circle cx="350" cy="30" r="5" fill="var(--p900)"/>
-          <circle cx="450" cy="10" r="5" fill="var(--p900)"/>
-        </svg>
-        <div style="text-align:right;font-family:'Fira Code',monospace;font-size:10px;color:var(--muted);margin-top:4px;">
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <svg width="20" height="4"><line x1="0" y1="2" x2="20" y2="2" stroke="var(--p900)" stroke-width="2" stroke-dasharray="4,2"/></svg>
-            Avg Rating trend (3.73 → 3.80)
-          </span>
-        </div>
+      <div class="chart-heading">Revenue by Delivery Window</div>
+      <div class="vbars" id="deliveryBars">
+        <div class="vbar-wrap"><div class="vbar-val">₹15.3M</div><div class="vbar" data-pct="100" style="background:var(--p700);"></div><div class="vbar-label">5 min</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹7.1M</div><div class="vbar" data-pct="46" style="background:var(--p600);"></div><div class="vbar-label">10 min</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹1.2M</div><div class="vbar" data-pct="8" style="background:var(--p500);"></div><div class="vbar-label">15 min</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹0.8M</div><div class="vbar" data-pct="5" style="background:var(--p400);"></div><div class="vbar-label">20 min</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">~₹0</div><div class="vbar" data-pct="1" style="background:var(--p300);"></div><div class="vbar-label">25 min</div></div>
       </div>
     </div>
 
-    <!-- On-Time vs Late -->
+    <!-- On-time vs late -->
     <div class="chart-card reveal">
-      <div class="chart-heading">Revenue by Late Delivery</div>
+      <div class="chart-heading">On-Time vs Late Revenue</div>
       <div class="dual-metric">
-        <div class="dm-item">
-          <div class="dm-val" style="color:var(--p600);">₹22M</div>
-          <div class="dm-label">On-Time ≤15 min</div>
-        </div>
-        <div class="dm-item" style="background:var(--p100);">
-          <div class="dm-val" style="color:#c0392b;">₹2M</div>
-          <div class="dm-label">Late &gt;15 min</div>
-        </div>
+        <div class="dm-item"><div class="dm-val" style="color:var(--p700);">₹22M</div><div class="dm-label">On-Time ≤15 min</div></div>
+        <div class="dm-item" style="background:var(--p100);"><div class="dm-val" style="color:#c0392b;">₹2M</div><div class="dm-label">Late &gt;15 min</div></div>
       </div>
-      <div class="ring-wrap" style="margin-top:1.5rem;">
-        <svg viewBox="0 0 120 120" width="100" height="100">
-          <circle cx="60" cy="60" r="48" fill="none" stroke="var(--p100)" stroke-width="18"/>
-          <circle cx="60" cy="60" r="48" fill="none" stroke="var(--p600)" stroke-width="18"
-            stroke-dasharray="275 26" stroke-dashoffset="69" stroke-linecap="round"/>
-          <circle cx="60" cy="60" r="48" fill="none" stroke="#e74c3c" stroke-width="18"
-            stroke-dasharray="26 301" stroke-dashoffset="-206" stroke-linecap="round"/>
-          <text x="60" y="56" text-anchor="middle" font-family="Outfit" font-size="14" font-weight="800" fill="var(--p800)">11×</text>
-          <text x="60" y="70" text-anchor="middle" font-family="Outfit" font-size="8" fill="var(--muted)">revenue gap</text>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120" width="95" height="95">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="var(--p100)" stroke-width="18"/>
+          <circle cx="60" cy="60" r="46" fill="none" stroke="var(--p700)" stroke-width="18"
+            stroke-dasharray="264 25" stroke-dashoffset="66" stroke-linecap="round"/>
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#e74c3c" stroke-width="18"
+            stroke-dasharray="25 289" stroke-dashoffset="-198" stroke-linecap="round"/>
+          <text x="60" y="55" text-anchor="middle" font-family="Outfit" font-size="13" font-weight="800" fill="var(--p800)">11×</text>
+          <text x="60" y="68" text-anchor="middle" font-family="Outfit" font-size="7.5" fill="var(--muted)">gap</text>
         </svg>
         <div class="ring-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--p600);"></div><span>On-Time — 91.8%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--p700);"></div><span>On-Time — 91.8%</span></div>
           <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;"></div><span>Late — 8.2%</span></div>
         </div>
       </div>
@@ -852,202 +989,128 @@
     <div class="chart-card reveal">
       <div class="chart-heading">Revenue by Payment Method</div>
       <div id="paymentBars">
-        <div class="bar-h">
-          <div class="bar-h-label">Credit Card</div>
-          <div class="bar-h-track"><div class="bar-h-fill" data-w="100" style="background:var(--p600);">₹5.0M</div></div>
-        </div>
-        <div class="bar-h">
-          <div class="bar-h-label">UPI</div>
-          <div class="bar-h-track"><div class="bar-h-fill" data-w="98" style="background:var(--p500);">₹4.9M</div></div>
-        </div>
-        <div class="bar-h">
-          <div class="bar-h-label">Cash on Delivery</div>
-          <div class="bar-h-track"><div class="bar-h-fill" data-w="98" style="background:var(--p500);">₹4.9M</div></div>
-        </div>
-        <div class="bar-h">
-          <div class="bar-h-label">Debit Card</div>
-          <div class="bar-h-track"><div class="bar-h-fill" data-w="96" style="background:var(--p400);">₹4.8M</div></div>
-        </div>
-        <div class="bar-h">
-          <div class="bar-h-label">Wallet</div>
-          <div class="bar-h-track"><div class="bar-h-fill" data-w="96" style="background:var(--p400);">₹4.8M</div></div>
-        </div>
+        <div class="bar-h"><div class="bar-h-label">Credit Card</div><div class="bar-h-track"><div class="bar-h-fill" data-w="100" style="background:var(--p700);">₹5.0M</div></div></div>
+        <div class="bar-h"><div class="bar-h-label">UPI</div><div class="bar-h-track"><div class="bar-h-fill" data-w="98" style="background:var(--p600);">₹4.9M</div></div></div>
+        <div class="bar-h"><div class="bar-h-label">Cash on Delivery</div><div class="bar-h-track"><div class="bar-h-fill" data-w="98" style="background:var(--p500);">₹4.9M</div></div></div>
+        <div class="bar-h"><div class="bar-h-label">Debit Card</div><div class="bar-h-track"><div class="bar-h-fill" data-w="96" style="background:var(--p400);">₹4.8M</div></div></div>
+        <div class="bar-h"><div class="bar-h-label">Wallet</div><div class="bar-h-track"><div class="bar-h-fill" data-w="96" style="background:var(--p300);">₹4.8M</div></div></div>
       </div>
     </div>
 
-    <!-- Category Revenue -->
+    <!-- Categories -->
     <div class="chart-card full reveal">
       <div class="chart-heading">Revenue vs Order Volume by Category</div>
-      <div style="position:relative;">
-        <div class="vbars" style="height:200px;" id="catBars">
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.5M</div>
-            <div class="vbar" data-pct="100" data-light="true"></div>
-            <div class="vbar-label">Dairy</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.5M</div>
-            <div class="vbar" data-pct="99" data-light="true"></div>
-            <div class="vbar-label">Personal Care</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.5M</div>
-            <div class="vbar" data-pct="98" data-light="true"></div>
-            <div class="vbar-label">Snacks</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.5M</div>
-            <div class="vbar" data-pct="96" data-light="true"></div>
-            <div class="vbar-label">Household</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.5M</div>
-            <div class="vbar" data-pct="97" data-light="true"></div>
-            <div class="vbar-label">Fruits &amp; Veg</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.4M</div>
-            <div class="vbar" data-pct="97" data-light="true"></div>
-            <div class="vbar-label">Beverages</div>
-          </div>
-          <div class="vbar-wrap">
-            <div class="vbar-val">₹3.4M</div>
-            <div class="vbar" data-pct="97" data-light="true"></div>
-            <div class="vbar-label">Groceries</div>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;gap:1.5rem;margin-top:1rem;font-size:0.8rem;color:var(--muted);">
-        <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:var(--p500);border-radius:2px;"></div>Total Revenue</div>
-        <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;background:var(--p200);border-radius:2px;"></div>Even distribution across categories — no single dominant</div>
+      <div class="vbars" id="catBars">
+        <div class="vbar-wrap"><div class="vbar-val">₹3.5M</div><div class="vbar" data-pct="100" data-light="true"></div><div class="vbar-label">Dairy</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.5M</div><div class="vbar" data-pct="99" data-light="true"></div><div class="vbar-label">Personal Care</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.5M</div><div class="vbar" data-pct="98" data-light="true"></div><div class="vbar-label">Snacks</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.5M</div><div class="vbar" data-pct="96" data-light="true"></div><div class="vbar-label">Household</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.5M</div><div class="vbar" data-pct="97" data-light="true"></div><div class="vbar-label">Fruits &amp; Veg</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.4M</div><div class="vbar" data-pct="97" data-light="true"></div><div class="vbar-label">Beverages</div></div>
+        <div class="vbar-wrap"><div class="vbar-val">₹3.4M</div><div class="vbar" data-pct="97" data-light="true"></div><div class="vbar-label">Groceries</div></div>
       </div>
     </div>
-
   </div>
 </section>
 
-<!-- INSIGHTS -->
+<!-- ════ INSIGHTS ════ -->
 <section class="section" id="insights">
   <div class="section-label reveal">Key Findings</div>
   <div class="section-title reveal">Critical Insights</div>
-  <p class="section-desc reveal">Derived directly from data. Operational speed outweighs demographic targeting or payment optimization.</p>
+  <p class="section-desc reveal">Derived directly from data. Operational speed outweighs demographic targeting or payment optimisation.</p>
 
   <div class="insights-grid">
     <div class="insight-card reveal">
       <div class="insight-num">01</div>
       <div class="insight-title">Delivery Speed = Revenue</div>
       <div class="insight-body">5-minute deliveries generate ₹15.3M — 62.8% of total revenue. The drop after 10 minutes is steep and non-linear. SLA compliance is the #1 business KPI.</div>
-      <div><span class="insight-tag tag-critical">Critical</span></div>
+      <span class="insight-tag tag-critical">Critical</span>
     </div>
     <div class="insight-card reveal">
       <div class="insight-num">02</div>
       <div class="insight-title">11× On-Time Revenue Gap</div>
       <div class="insight-body">On-time deliveries (≤15 min) generate ₹22M versus just ₹2M from late orders. Eliminating late deliveries could recover up to ₹2M per order cycle.</div>
-      <div><span class="insight-tag tag-critical">Critical</span></div>
+      <span class="insight-tag tag-critical">Critical</span>
     </div>
     <div class="insight-card reveal">
       <div class="insight-num">03</div>
       <div class="insight-title">Ratings Lag at 3.20/5</div>
-      <div class="insight-body">Average customer satisfaction is below benchmark. Late deliveries are the primary driver. Achieving ≥4.0 is possible through SLA improvements alone.</div>
-      <div><span class="insight-tag tag-high">High Priority</span></div>
+      <div class="insight-body">Average satisfaction is below benchmark. Late deliveries are the primary driver. Achieving ≥4.0 is possible through SLA improvements alone.</div>
+      <span class="insight-tag tag-high">High Priority</span>
     </div>
     <div class="insight-card reveal">
       <div class="insight-num">04</div>
       <div class="insight-title">Demographics Don't Drive Revenue</div>
-      <div class="insight-body">Age group, gender, and payment method show minimal variation in revenue. Demographic-targeted campaigns are lower ROI than operational improvements.</div>
-      <div><span class="insight-tag tag-medium">Medium</span></div>
+      <div class="insight-body">Age group, gender, and payment method show minimal variation. Demographic campaigns are lower-ROI than operational improvements.</div>
+      <span class="insight-tag tag-medium">Medium</span>
     </div>
     <div class="insight-card reveal">
       <div class="insight-num">05</div>
       <div class="insight-title">Loyal Customers = Higher AOV</div>
-      <div class="insight-body">Customer segment shows moderate variation. Loyal customers generate higher average order values, validating investment in retention over acquisition.</div>
-      <div><span class="insight-tag tag-medium">Medium</span></div>
+      <div class="insight-body">Customer segment shows moderate variation. Loyal customers generate higher average order values, validating retention investment over acquisition.</div>
+      <span class="insight-tag tag-medium">Medium</span>
     </div>
     <div class="insight-card reveal">
       <div class="insight-num">06</div>
       <div class="insight-title">Grocery &amp; Dairy Lead Categories</div>
-      <div class="insight-body">Core categories drive consistent, recurring demand. Revenue is evenly distributed, but grocery and dairy show strongest habitual repurchase behavior.</div>
-      <div><span class="insight-tag tag-medium">Medium</span></div>
+      <div class="insight-body">Core categories drive consistent, recurring demand. Grocery and dairy show strongest habitual repurchase behavior across all segments.</div>
+      <span class="insight-tag tag-medium">Medium</span>
     </div>
   </div>
 </section>
 
-<!-- ACTIONS / PRIORITY MATRIX -->
-<section class="section" id="actions" style="background:var(--surface);">
+<!-- ════ ACTIONS ════ -->
+<section class="section" id="actions" style="background:var(--p50);">
   <div class="section-label reveal">Priority Action Matrix</div>
   <div class="section-title reveal">Business Recommendations</div>
   <p class="section-desc reveal">Sequenced actions ranked by revenue impact and urgency.</p>
 
   <div class="priority-table reveal">
-    <div class="pt-head">
-      <div>#</div>
-      <div>Finding &amp; Action</div>
-      <div>Expected Impact</div>
-      <div>Priority</div>
-    </div>
+    <div class="pt-head"><div>#</div><div>Finding &amp; Action</div><div>Expected Impact</div><div>Priority</div></div>
     <div class="pt-row">
       <div class="pt-num">01</div>
-      <div>
-        <div class="pt-finding">5-min deliveries = ₹15.3M (62.8%)</div>
-        <div class="pt-action">Set 5-min delivery as SLA standard; invest in dark store proximity and rider density.</div>
-      </div>
+      <div><div class="pt-finding">5-min deliveries = ₹15.3M (62.8%)</div><div class="pt-action">Set 5-min delivery as SLA standard; invest in dark store proximity and rider density.</div></div>
       <div class="pt-impact">Protect &amp; grow highest-revenue window</div>
       <div><span class="badge badge-critical">Critical</span></div>
     </div>
     <div class="pt-row">
       <div class="pt-num">02</div>
-      <div>
-        <div class="pt-finding">Late deliveries (&gt;15 min) = ₹2M only</div>
-        <div class="pt-action">Real-time monitoring dashboard; alert riders at 12-minute mark.</div>
-      </div>
+      <div><div class="pt-finding">Late deliveries (&gt;15 min) = ₹2M only</div><div class="pt-action">Real-time monitoring; trigger alerts at 12-minute mark.</div></div>
       <div class="pt-impact">Recover up to ₹2M per cycle</div>
       <div><span class="badge badge-critical">Critical</span></div>
     </div>
     <div class="pt-row">
       <div class="pt-num">03</div>
-      <div>
-        <div class="pt-finding">Avg rating 3.20/5 — below benchmark</div>
-        <div class="pt-action">Tie rider incentives to on-time rate; target ≥4.0 average rating.</div>
-      </div>
+      <div><div class="pt-finding">Avg rating 3.20/5 — below benchmark</div><div class="pt-action">Tie rider incentives to on-time rate; target ≥4.0 average rating.</div></div>
       <div class="pt-impact">Improve retention &amp; repeat orders</div>
       <div><span class="badge badge-high">High</span></div>
     </div>
     <div class="pt-row">
       <div class="pt-num">04</div>
-      <div>
-        <div class="pt-finding">Revenue drops sharply after 10 min</div>
-        <div class="pt-action">Optimize peak-hour staffing with surge riders during high-demand windows.</div>
-      </div>
+      <div><div class="pt-finding">Revenue drops sharply after 10 min</div><div class="pt-action">Optimize peak-hour staffing with surge riders during high-demand windows.</div></div>
       <div class="pt-impact">Shift orders into 5–10 min window</div>
       <div><span class="badge badge-high">High</span></div>
     </div>
     <div class="pt-row">
       <div class="pt-num">05</div>
-      <div>
-        <div class="pt-finding">Grocery &amp; dairy = highest consistent revenue</div>
-        <div class="pt-action">Prioritize stock for top-10 SKUs in grocery/dairy at all dark store locations.</div>
-      </div>
+      <div><div class="pt-finding">Grocery &amp; dairy = highest consistent revenue</div><div class="pt-action">Prioritize top-10 SKU availability at all dark store locations.</div></div>
       <div class="pt-impact">Reduce out-of-stock cancellations</div>
       <div><span class="badge badge-medium">Medium</span></div>
     </div>
     <div class="pt-row">
       <div class="pt-num">06</div>
-      <div>
-        <div class="pt-finding">Loyal customers have higher AOV</div>
-        <div class="pt-action">Launch loyalty tier with free priority delivery for repeat customers.</div>
-      </div>
+      <div><div class="pt-finding">Loyal customers have higher AOV</div><div class="pt-action">Launch loyalty tier with free priority delivery for repeat customers.</div></div>
       <div class="pt-impact">Increase Loyal segment LTV</div>
       <div><span class="badge badge-medium">Medium</span></div>
     </div>
   </div>
 
-  <!-- 3-tier framework -->
   <div class="section-label reveal" style="margin-top:3rem;">Operational Framework</div>
   <div class="fw-grid reveal">
     <div class="fw-item">
       <div class="fw-tier">Tier 1 — Immediate</div>
       <div class="fw-title">Speed Optimization</div>
-      <div class="fw-desc">Dark store placement, rider density, real-time SLA monitoring. Delivery time reduction is the #1 priority.</div>
+      <div class="fw-desc">Dark store placement, rider density, real-time SLA monitoring. Delivery time reduction is the #1 revenue lever.</div>
       <div class="fw-metric">~₹12M/yr recovery</div>
     </div>
     <div class="fw-item">
@@ -1059,94 +1122,341 @@
     <div class="fw-item">
       <div class="fw-tier">Tier 3 — Medium-term</div>
       <div class="fw-title">Revenue Deepening</div>
-      <div class="fw-desc">Top-SKU availability, loyalty program, upsell at checkout. Leverage loyal segment's higher AOV.</div>
+      <div class="fw-desc">Top-SKU availability, loyalty tier program, upsell at checkout. Leverage loyal segment's higher AOV.</div>
       <div class="fw-metric">+Segment share</div>
     </div>
   </div>
 </section>
 
-<!-- CONCLUSION -->
+<!-- ════ CONCLUSION ════ -->
 <section class="conclusion">
   <div class="section-label reveal">Conclusion</div>
   <div class="section-title reveal">Delivery Speed Wins</div>
-  <p class="section-desc reveal">The central finding is actionable: delivery speed is the dominant revenue driver in quick-commerce. Demographic campaigns are lower-ROI. Resources are better directed at dark store placement, rider density, and real-time monitoring.</p>
-
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;" class="reveal">
-    <div class="conc-stat">
-      <div class="conc-stat-val">₹15.3M</div>
-      <div class="conc-stat-desc">from 5-min deliveries — 62.8% of total revenue</div>
-    </div>
-    <div class="conc-stat">
-      <div class="conc-stat-val">11×</div>
-      <div class="conc-stat-desc">on-time vs late revenue gap (₹22M vs ₹2M)</div>
-    </div>
-    <div class="conc-stat">
-      <div class="conc-stat-val">~₹12M</div>
-      <div class="conc-stat-desc">annual recovery potential from Tier 1 alone</div>
-    </div>
+  <p class="section-desc reveal">The central finding is actionable: delivery speed is the dominant revenue driver in quick-commerce. Demographic campaigns are lower-ROI. Resources are better directed at dark store placement, rider density, and real-time SLA monitoring.</p>
+  <div class="conc-grid reveal">
+    <div class="conc-stat"><div class="conc-stat-val">₹15.3M</div><div class="conc-stat-desc">from 5-min deliveries — 62.8% of total revenue</div></div>
+    <div class="conc-stat"><div class="conc-stat-val">11×</div><div class="conc-stat-desc">on-time vs late revenue gap (₹22M vs ₹2M)</div></div>
+    <div class="conc-stat"><div class="conc-stat-val">~₹12M</div><div class="conc-stat-desc">annual recovery potential from Tier 1 alone</div></div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ════ FOOTER ════ -->
 <footer>
   <div class="footer-brand">Zepto · Sales &amp; Delivery Analysis</div>
+  <a class="footer-gh" href="https://github.com/your-username/zepto-sales-delivery-eda" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    View on GitHub
+  </a>
   <div class="footer-note">41,000 Orders · ₹24.36M Revenue · Quick-Commerce EDA</div>
 </footer>
 
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════ -->
 <script>
-  // ── SCROLL REVEAL ──
-  const reveals = document.querySelectorAll('.reveal');
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.style.transitionDelay = (i % 5) * 0.07 + 's';
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+reveals.forEach(el => revealObs.observe(el));
+
+/* ── STATIC BAR ANIMATIONS ── */
+function animateVbars(selector, maxH) {
+  const container = document.querySelector(selector);
+  if (!container) return;
   const obs = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        e.target.style.transitionDelay = (i % 5) * 0.07 + 's';
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.08 });
-  reveals.forEach(el => obs.observe(el));
-
-  // ── ANIMATE VERTICAL BARS ──
-  function animateBars(selector, maxH) {
-    const container = document.querySelector(selector);
-    if (!container) return;
-    const barObs = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        container.querySelectorAll('.vbar').forEach(bar => {
-          const pct = parseInt(bar.dataset.pct);
-          const isLight = bar.dataset.light;
-          if (isLight) {
-            bar.style.background = `hsl(270, ${40 + pct * 0.3}%, ${55 + (100 - pct) * 0.2}%)`;
-          }
-          bar.style.height = (pct / 100 * maxH) + 'px';
-        });
-        barObs.disconnect();
-      }
-    }, { threshold: 0.3 });
-    barObs.observe(container);
-  }
-
-  animateBars('#deliveryBars', 130);
-  animateBars('#catBars', 150);
-
-  // ── ANIMATE HORIZONTAL BARS ──
-  const hBarObs = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
-      document.querySelectorAll('.bar-h-fill').forEach(bar => {
-        bar.style.width = bar.dataset.w + '%';
+      container.querySelectorAll('.vbar').forEach(bar => {
+        const pct = parseInt(bar.dataset.pct);
+        if (bar.dataset.light) bar.style.background = `hsl(285, ${35 + pct * 0.3}%, ${45 + (100-pct)*0.2}%)`;
+        bar.style.height = (pct / 100 * maxH) + 'px';
       });
-      hBarObs.disconnect();
+      obs.disconnect();
     }
   }, { threshold: 0.3 });
-  const payBars = document.querySelector('#paymentBars');
-  if (payBars) hBarObs.observe(payBars);
+  obs.observe(container);
+}
+animateVbars('#deliveryBars', 120);
+animateVbars('#catBars', 120);
 
-  // Draw rating SVG line
-  const ratingLine = document.getElementById('ratingLine');
-  if (ratingLine) {
-    ratingLine.setAttribute('points', '50,130 150,100 250,60 350,30 450,10');
+const hObs = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    document.querySelectorAll('.bar-h-fill').forEach(b => { b.style.width = b.dataset.w + '%'; });
+    hObs.disconnect();
   }
+}, { threshold: 0.3 });
+const payBars = document.querySelector('#paymentBars');
+if (payBars) hObs.observe(payBars);
+
+/* ══════════════════════════════════
+   INTERACTIVE DASHBOARD ENGINE
+   ══════════════════════════════════ */
+const CITIES    = ['Amritsar','Bengaluru','Chennai','Delhi','Gurgaon','Haridwar','Hyderabad','Jaipur'];
+const SEGMENTS  = ['18-25 (Young)','26-35 (Adult)','36-45 (Mid Age)','46+ Senior'];
+const CATEGORIES= ['Beverages','Dairy','Fruits & Veg','Groceries','Household','Personal Care','Snacks'];
+const PAYMENTS  = ['Credit Card','UPI','Cash on Delivery','Debit Card','Wallet'];
+
+const CITY_W = [0.09,0.18,0.14,0.22,0.10,0.06,0.13,0.08];
+const SEG_W  = [0.28,0.32,0.25,0.15];
+const CAT_W  = [0.13,0.15,0.15,0.15,0.14,0.14,0.14];
+const DT_REV = [15.3,7.1,1.2,0.8,0.05];
+const DT_RATE= [3.73,3.74,3.77,3.79,3.80];
+const TOTAL_REV = 24.36, TOTAL_ORD = 41000;
+
+const filters = { city:new Set(), segment:new Set(), category:new Set(), delivery:new Set() };
+
+/* Build slicer checkboxes */
+function buildSlicer(id, items, key) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  items.forEach((item, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'slicer-item';
+    wrap.dataset.key = key; wrap.dataset.val = item;
+    const inp = document.createElement('input');
+    inp.type = 'checkbox'; inp.id = `${key}_${i}`; inp.value = item;
+    inp.addEventListener('change', () => onSlicerChange(key, item, inp.checked));
+    const lbl = document.createElement('label');
+    lbl.htmlFor = inp.id; lbl.textContent = item;
+    wrap.appendChild(inp); wrap.appendChild(lbl);
+    wrap.addEventListener('click', e => {
+      if (e.target !== inp && e.target !== lbl) {
+        inp.checked = !inp.checked;
+        onSlicerChange(key, item, inp.checked);
+      }
+    });
+    el.appendChild(wrap);
+  });
+}
+buildSlicer('citySlicers',     CITIES,    'city');
+buildSlicer('segmentSlicers',  SEGMENTS,  'segment');
+buildSlicer('categorySlicers', CATEGORIES,'category');
+buildSlicer('deliverySlicers', ['On Time','Late'], 'delivery');
+
+function onSlicerChange(key, val, checked) {
+  if (checked) filters[key].add(val); else filters[key].delete(val);
+  document.querySelectorAll(`.slicer-item[data-key="${key}"]`).forEach(el =>
+    el.classList.toggle('active', filters[key].has(el.dataset.val))
+  );
+  updateDashboard();
+}
+function clearSlicer(key) {
+  filters[key].clear();
+  document.querySelectorAll(`input[id^="${key}_"]`).forEach(i => i.checked = false);
+  document.querySelectorAll(`.slicer-item[data-key="${key}"]`).forEach(el => el.classList.remove('active'));
+  updateDashboard();
+}
+
+/* Compute multiplier from active filters */
+function getMultiplier() {
+  let cityM = 1, segM = 1, catM = 1, delM = 1;
+  if (filters.city.size > 0) {
+    cityM = [...filters.city].reduce((s,c) => { const i=CITIES.indexOf(c); return s+(i>=0?CITY_W[i]:0); }, 0);
+  }
+  if (filters.segment.size > 0) {
+    segM = [...filters.segment].reduce((s,c) => { const i=SEGMENTS.indexOf(c); return s+(i>=0?SEG_W[i]:0); }, 0);
+  }
+  if (filters.category.size > 0) {
+    catM = [...filters.category].reduce((s,c) => { const i=CATEGORIES.indexOf(c); return s+(i>=0?CAT_W[i]:0); }, 0);
+  }
+  if (filters.delivery.size === 1) delM = filters.delivery.has('On Time') ? 0.918 : 0.082;
+  return cityM * segM * catM * delM;
+}
+
+function computeKPIs() {
+  const m = getMultiplier();
+  let aov = 594, rating = 3.20;
+  if (filters.delivery.has('Late') && !filters.delivery.has('On Time'))   { aov=612; rating=2.94; }
+  if (filters.delivery.has('On Time') && !filters.delivery.has('Late'))   { aov=591; rating=3.28; }
+  return { rev: TOTAL_REV*m, orders: Math.round(TOTAL_ORD*m), aov, rating };
+}
+
+function getDeliveryData() {
+  const m = getMultiplier();
+  let revs = DT_REV.map(r => r*m);
+  if (filters.delivery.size === 1) {
+    if (filters.delivery.has('On Time')) { revs[3]=0; revs[4]=0; }
+    if (filters.delivery.has('Late'))    { revs[0]=0; revs[1]=0; revs[2]=0; }
+  }
+  return { revenues: revs, rates: [...DT_RATE] };
+}
+
+function getLateData() {
+  const m = getMultiplier();
+  let onT = 22*m, late = 2*m;
+  if (filters.delivery.size === 1) {
+    if (filters.delivery.has('On Time')) late=0;
+    if (filters.delivery.has('Late'))    onT=0;
+  }
+  return [onT, late];
+}
+
+function getPaymentData() {
+  const m = getMultiplier();
+  return [5.0,4.9,4.9,4.8,4.8].map(v => +(v*m).toFixed(2));
+}
+
+function getCategoryData() {
+  const m = getMultiplier();
+  let weights = filters.category.size > 0
+    ? CAT_W.map((w,i) => filters.category.has(CATEGORIES[i]) ? w : 0)
+    : [...CAT_W];
+  const total = weights.reduce((a,b)=>a+b,0)||1;
+  return {
+    revenues: weights.map(w => +(TOTAL_REV*m*(w/total)).toFixed(2)),
+    orders:   weights.map(w => Math.round(TOTAL_ORD*m*(w/total)))
+  };
+}
+
+/* Chart instances */
+const CI = {};
+Chart.defaults.font.family = "'Outfit',sans-serif";
+Chart.defaults.font.size = 10;
+Chart.defaults.color = '#7a5a85';
+
+const PUR = ['#6b007b','#8a00a0','#a800c8','#c44de0','#da85ee','#4a0060','#2d0036'];
+
+function makeOrUpdate(id, cfg) {
+  if (CI[id]) { CI[id].data=cfg.data; if(cfg.options) CI[id].options=cfg.options; CI[id].update('active'); }
+  else { CI[id] = new Chart(document.getElementById(id).getContext('2d'), cfg); }
+}
+
+function renderDeliveryChart() {
+  const {revenues,rates} = getDeliveryData();
+  makeOrUpdate('chartDelivery',{
+    type:'bar',
+    data:{
+      labels:['5 min','10 min','15 min','20 min','25 min'],
+      datasets:[
+        {type:'bar',label:'Revenue (₹M)',data:revenues,backgroundColor:'#8a00a0',borderRadius:3,yAxisID:'y'},
+        {type:'line',label:'Avg Rating',data:rates,borderColor:'#2d0036',backgroundColor:'transparent',
+         pointBackgroundColor:'#2d0036',pointRadius:3,tension:0.3,yAxisID:'y2'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{boxWidth:8,padding:8,font:{size:9}}},
+               tooltip:{callbacks:{label:c=>c.datasetIndex===0?`₹${c.parsed.y.toFixed(2)}M`:`Rating: ${c.parsed.y.toFixed(2)}`}}},
+      scales:{
+        y: {position:'left', grid:{color:'#f5eeff'}, ticks:{callback:v=>'₹'+v+'M',font:{size:9}}},
+        y2:{position:'right',grid:{drawOnChartArea:false},min:3.6,max:3.9,ticks:{callback:v=>v.toFixed(2),font:{size:9}}},
+        x: {grid:{display:false},ticks:{font:{size:9}}}
+      }
+    }
+  });
+}
+
+function renderLateChart() {
+  const [onT,late] = getLateData();
+  makeOrUpdate('chartLate',{
+    type:'bar',
+    data:{labels:['On Time','Late'],datasets:[{label:'Revenue (₹M)',data:[onT,late],backgroundColor:['#6b007b','#c44de0'],borderRadius:5}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`₹${c.parsed.x.toFixed(2)}M`}}},
+      scales:{x:{grid:{color:'#f5eeff'},ticks:{callback:v=>'₹'+v+'M',font:{size:9}}},y:{grid:{display:false},ticks:{font:{size:9}}}}
+    }
+  });
+}
+
+function renderPaymentChart() {
+  const revs = getPaymentData();
+  makeOrUpdate('chartPayment',{
+    type:'bar',
+    data:{labels:PAYMENTS,datasets:[{label:'Revenue (₹M)',data:revs,backgroundColor:PUR.slice(0,5),borderRadius:3}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`₹${c.parsed.x.toFixed(2)}M`}}},
+      scales:{x:{grid:{color:'#f5eeff'},ticks:{callback:v=>'₹'+v+'M',font:{size:9}}},y:{grid:{display:false},ticks:{font:{size:9}}}}
+    }
+  });
+}
+
+function renderCategoryChart() {
+  const {revenues,orders} = getCategoryData();
+  makeOrUpdate('chartCategory',{
+    type:'bar',
+    data:{
+      labels:CATEGORIES,
+      datasets:[
+        {type:'bar',label:'Revenue',data:revenues,backgroundColor:'#8a00a0',borderRadius:3,yAxisID:'y'},
+        {type:'line',label:'Orders',data:orders,borderColor:'#2d0036',backgroundColor:'transparent',
+         pointBackgroundColor:'#2d0036',pointRadius:2,tension:0.4,yAxisID:'y2'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{boxWidth:8,padding:8,font:{size:9}}},
+               tooltip:{callbacks:{label:c=>c.datasetIndex===0?`₹${c.parsed.y.toFixed(2)}M`:`${c.parsed.y.toLocaleString()} orders`}}},
+      scales:{
+        y: {position:'left', grid:{color:'#f5eeff'},ticks:{callback:v=>'₹'+v+'M',font:{size:9}}},
+        y2:{position:'right',grid:{drawOnChartArea:false},ticks:{font:{size:9}}},
+        x: {grid:{display:false},ticks:{font:{size:8}}}
+      }
+    }
+  });
+}
+
+function animateKPI(id, val) {
+  const el = document.getElementById(id);
+  el.textContent = val;
+  el.classList.remove('kpi-pop');
+  void el.offsetWidth;
+  el.classList.add('kpi-pop');
+}
+
+function updateKPIs() {
+  const {rev,orders,aov,rating} = computeKPIs();
+  animateKPI('kpiRevenue', rev>=1 ? `₹${rev.toFixed(2)}M` : `₹${(rev*1000).toFixed(0)}K`);
+  animateKPI('kpiOrders',  orders>=1000 ? `${(orders/1000).toFixed(1)}K` : orders.toString());
+  animateKPI('kpiAOV',     `₹${Math.round(aov)}`);
+  animateKPI('kpiRating',  rating.toFixed(2));
+}
+
+function updateFilterBar() {
+  const bar = document.getElementById('filterBar');
+  const badges = [];
+  ['city','segment','category','delivery'].forEach(key =>
+    filters[key].forEach(val =>
+      badges.push(`<span class="filter-badge" onclick="clearOne('${key}','${val}')">${val} <span>×</span></span>`)
+    )
+  );
+  if (badges.length) {
+    bar.style.display = 'flex';
+    bar.innerHTML = `<span style="font-size:9px;font-weight:700;color:var(--muted);margin-right:4px;">FILTERS:</span>` + badges.join('');
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearOne(key, val) {
+  filters[key].delete(val);
+  const inp = document.querySelector(`input[value="${val}"][id^="${key}_"]`);
+  if (inp) inp.checked = false;
+  document.querySelectorAll(`.slicer-item[data-key="${key}"][data-val="${val}"]`).forEach(el => el.classList.remove('active'));
+  updateDashboard();
+}
+
+function updateDashboard() {
+  updateKPIs();
+  renderDeliveryChart();
+  renderLateChart();
+  renderPaymentChart();
+  renderCategoryChart();
+  updateFilterBar();
+}
+
+/* Init */
+updateDashboard();
 </script>
 </body>
 </html>
