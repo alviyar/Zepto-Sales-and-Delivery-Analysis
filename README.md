@@ -2,7 +2,8 @@
 
 **LINK**: https://alviyar.github.io/Zepto-Sales-and-Delivery-Analysis/  
 
-<img width="1368" height="767" alt="image" src="https://github.com/user-attachments/assets/cab30ce7-73da-47b0-9521-fec01afba278" />
+<img width="1367" height="772" alt="image" src="https://github.com/user-attachments/assets/b998320e-dc9a-477c-a849-80bba595df41" />
+
 
 
 
