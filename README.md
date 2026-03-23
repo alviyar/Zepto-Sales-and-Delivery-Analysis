@@ -2,7 +2,8 @@
 
 **LINK**: https://alviyar.github.io/Zepto-Sales-and-Delivery-Analysis/  
 
-<img width="1377" height="781" alt="image" src="https://github.com/user-attachments/assets/c3a075ad-cd95-48d8-bd06-e0c103d436d8" />
+<img width="1368" height="767" alt="image" src="https://github.com/user-attachments/assets/cab30ce7-73da-47b0-9521-fec01afba278" />
+
 
 
 
@@ -34,7 +35,7 @@ Total Orders: 41K
 
 Average Order Value (AOV): ₹594
 
-Average Customer Rating: 3.20
+Average Delivery Partner Rating: 3.74
 
 Late Delivery %: Defined as delivery time > 15 minutes
 
